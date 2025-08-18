@@ -47,4 +47,14 @@ if st.button("✨ 추천 직업 보기 ✨"):
         st.markdown("<hr style='border:1px solid #ddd;'>", unsafe_allow_html=True)
         st.info("더 많은 직업과 상세 정보를 원하시면 계속해서 개선할 수 있어요! 🚀")
     else:
-       
+       if st.button("✨ 추천 직업 보기 ✨"):
+    recommended_jobs = mbti_jobs.get(mbti_select, [])
+    if recommended_jobs:
+        st.markdown(f"<h2 style='text-align:center; color:#FF6F61;'>💼 {mbti_select} 유형에 적합한 직업들 💼</h2>", unsafe_allow_html=True)
+        for job in recommended_jobs:
+            st.write(f"### {job} 🎉")
+        st.markdown("<hr style='border:1px solid #ddd;'>", unsafe_allow_html=True)
+        st.info("더 많은 직업과 상세 정보를 원하시면 계속해서 개선할 수 있어요! 🚀")
+    else:
+        st.write("추천 직업이 없습니다.")
+
