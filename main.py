@@ -1,74 +1,112 @@
 import streamlit as st
+from PIL import Image
+import random
 
-# --- MBTI 유형별 추천 직업 데이터 ---
-# 이 부분은 실제 서비스에 맞게 데이터를 더욱 풍부하게 채워주세요!
-# 각 유형별로 어울리는 직업들을 리스트 형태로 구성했습니다.
-mbti_career_data = {
-    "ISTJ": ["회계사", "관리자", "정보 시스템 관리자", "법률가", "경찰관"],
-    "ISFJ": ["간호사", "교사 (유아/초등)", "사회복지사", "사서", "행정 보조원"],
-    "INFJ": ["상담사", "심리학자", "작가", "예술가", "교사 (고등/대학교)", "성직자"],
-    "INTJ": ["과학자", "엔지니어", "대학교수", "컴퓨터 프로그래머", "전략 컨설턴트"],
-    "ISTP": ["기술자", "경찰관", "소방관", "운동선수", "파일럿", "정비사"],
-    "ISFP": ["예술가", "음악가", "디자이너", "수의사", "조경사", "요리사"],
-    "INFP": ["작가", "예술가", "심리학자", "상담사", "도서관 사서", "번역가"],
-    "INTP": ["과학자", "수학자", "컴퓨터 과학자", "철학자", "연구원", "프로그래머"],
-    "ESTP": ["영업 사원", "사업가", "경찰관", "응급 구조원", "트레이너", "스포츠 코치"],
-    "ESFP": ["연예인", "이벤트 기획자", "교사 (초등)", "트레이너", "영업 사원", "여행 가이드"],
-    "ENFP": ["홍보 전문가", "광고 기획자", "심리학자", "작가", "예술가", "마케터", "컨설턴트"],
-    "ENTP": ["사업가", "경영 컨설턴트", "변호사", "과학자", "발명가", "벤처 투자자"],
-    "ESTJ": ["경영자", "감독관", "군인", "재정 관리자", "법률가", "은행원"],
-    "ESFJ": ["교사 (초등/중등)", "간호사", "사회복지사", "행정직", "상담사", "승무원"],
-    "ENFJ": ["교사 (중등/고등)", "상담사", "성직자", "HR 전문가", "정치인", "강사"],
-    "ENTJ": ["사업가", "경영 컨설턴트", "변호사", "대학교수", "리더", "고위 공무원"],
-}
+# -------------------------------
+# 페이지 설정
+# -------------------------------
+st.set_page_config(page_title="학습 방법 추천 앱", page_icon="📚", layout="wide")
 
-def get_career_recommendations(mbti_type):
-    """
-    선택된 MBTI 유형에 따른 직업 추천을 반환합니다.
-    """
-    return mbti_career_data.get(mbti_type, ["해당 MBTI 유형에 대한 정보가 아직 없습니다. 😅"])
+st.title("📚 나에게 맞는 학습 방법 찾기")
+st.write("""
+이 앱은 학습자의 **스타일**과 **목표**를 입력받아, 가장 적합한 학습 방법을 추천해줍니다.
+""")
 
-# --- Streamlit 앱 메인 함수 ---
-def main():
-    st.set_page_config(page_title="MBTI 기반 직업 추천 (진로 교육용)", layout="centered")
+# -------------------------------
+# 사이드바 입력
+# -------------------------------
+st.sidebar.header("📌 나의 학습 정보 입력")
+name = st.sidebar.text_input("이름을 입력하세요:")
+subject = st.sidebar.selectbox("공부할 과목을 선택하세요", ["수학", "영어", "과학", "역사", "프로그래밍"])
+style = st.sidebar.radio("학습 스타일", ["시각형 (Visual)", "청각형 (Auditory)", "운동감각형 (Kinesthetic)", "읽기/쓰기형 (Reading/Writing)"])
+goal = st.sidebar.selectbox("목표", ["시험 대비", "장기적 이해", "프로젝트 수행", "기초 개념 익히기", "창의적 문제 해결"])
 
-    st.title("💡 MBTI 기반 직업 추천 웹 (진로 교육용)")
-    st.write("안녕하세요, yuns0726님! 이 웹 앱은 여러분의 MBTI 유형에 기반하여 어울리는 직업들을 추천해 드립니다. 😉")
-    st.write("자기 이해와 진로 탐색에 작은 도움이 되기를 바랍니다.")
-    st.markdown("---")
+# -------------------------------
+# 추천 알고리즘 (다양화)
+# -------------------------------
+def recommend_method(subject, style, goal):
+    if style == "시각형 (Visual)":
+        if goal == "시험 대비":
+            return [
+                "마인드맵과 요약 노트를 활용해 시각적으로 정리하세요.",
+                "색깔 펜과 하이라이트로 중요한 부분을 강조하세요.",
+                "과목별 개념도를 만들어 전체 구조를 파악하세요."
+            ], "visual_map.jpg"
+        elif goal == "창의적 문제 해결":
+            return [
+                "디자인 씽킹 보드나 아이디어 스케치를 활용하세요.",
+                "비주얼 브레인스토밍을 통해 다양한 아이디어를 연결해보세요."
+            ], "visual_creative.jpg"
+        else:
+            return [
+                "인포그래픽, 도표, 색상 강조 자료를 활용하세요.",
+                "영상 강의와 그림 자료를 반복 시청하세요."
+            ], "visual_study.jpg"
 
-    # MBTI 유형 선택 드롭다운
-    # 사용자에게 선택지를 제공하기 위해 모든 MBTI 유형을 포함합니다.
-    mbti_types = sorted(list(mbti_career_data.keys())) # 가나다순으로 정렬
-    
-    selected_mbti = st.selectbox(
-        "✨ 당신의 MBTI 유형을 선택해 주세요:",
-        ["MBTI 유형을 선택하세요"] + mbti_types, # 기본 메시지를 첫 번째 항목으로 추가
-        help="MBTI는 마이어스-브릭스 유형 지표로, 성격 유형을 분류하는 도구입니다."
-    )
+    elif style == "청각형 (Auditory)":
+        if goal == "장기적 이해":
+            return [
+                "스터디 그룹 토론이나 강의 녹음을 통해 반복 학습하세요.",
+                "자신의 목소리로 개념을 설명하고 녹음해 들어보세요."
+            ], "auditory_group.jpg"
+        elif goal == "시험 대비":
+            return [
+                "암기할 내용을 노래 가사처럼 만들어 외워보세요.",
+                "강의나 설명을 여러 번 들어보세요."
+            ], "auditory_exam.jpg"
+        else:
+            return [
+                "팟캐스트, 오디오 강의로 학습하세요.",
+                "학습 내용을 친구에게 설명하며 대화형으로 복습하세요."
+            ], "auditory_learning.jpg"
 
-    # 선택된 MBTI 유형이 있을 때만 추천 버튼 표시
-    if selected_mbti != "MBTI 유형을 선택하세요":
-        if st.button("나에게 맞는 직업 추천받기! 🚀"):
-            st.markdown("---")
-            st.subheader(f"✅ {selected_mbti} 유형을 위한 추천 직업:")
-            recommendations = get_career_recommendations(selected_mbti)
-            
-            if recommendations:
-                st.info(f"**{selected_mbti}** 유형은 다음과 같은 특징을 가질 수 있으며, 이에 따라 해당 직업들이 잘 어울릴 수 있습니다. (설명 추가 예정)") # 나중에 MBTI 유형별 상세 설명 추가 공간
-                st.write("---")
-                for i, career in enumerate(recommendations):
-                    st.success(f"**{i+1}.** {career}") # 번호를 붙여 보기 좋게 표시
-            else:
-                st.warning("죄송합니다. 선택하신 MBTI 유형에 대한 추천 직업 데이터를 찾을 수 없습니다. ㅠㅠ")
-    else:
-        st.info("☝️ 위에 있는 드롭다운 메뉴에서 여러분의 MBTI 유형을 선택해주세요!")
+    elif style == "운동감각형 (Kinesthetic)":
+        if goal == "프로젝트 수행":
+            return [
+                "실습 중심 프로젝트나 실험을 통해 배우세요.",
+                "직접 손으로 코드를 작성하거나 실험을 진행하세요."
+            ], "kinesthetic_project.jpg"
+        else:
+            return [
+                "카드 정리, 퀴즈, 모형 만들기 등 활동 기반 학습을 해보세요.",
+                "실제 사례를 적용하며 배우세요."
+            ], "kinesthetic_learning.jpg"
 
-    st.markdown("---")
-    st.caption("🚨 **면책 조항:** 본 직업 추천은 일반적인 MBTI 유형별 경향을 바탕으로 하며, 실제 직업 선택은 개인의 재능, 흥미, 가치관, 경험 등 다양한 요소를 종합적으로 고려하여 신중하게 결정해야 합니다. 재미와 교육 목적으로만 활용해주세요!")
-    st.caption("개발자: yuns0726님 (가나다 드림 🌠)")
+    elif style == "읽기/쓰기형 (Reading/Writing)":
+        if goal == "기초 개념 익히기":
+            return [
+                "교재를 꼼꼼히 읽고 노트 필기를 정리하세요.",
+                "배운 내용을 글로 요약해 블로그나 일지에 기록하세요."
+            ], "reading_basic.jpg"
+        else:
+            return [
+                "문제집 풀이와 서술형 답안을 작성해보세요.",
+                "자신만의 요약집을 만들어 반복 학습하세요."
+            ], "reading_study.jpg"
 
+    return ["일반적인 학습 방법을 참고하세요."], "default.jpg"
 
-# --- 앱 실행 부분 ---
-if __name__ == "__main__":
-    main()
+# -------------------------------
+# 추천 결과 출력
+# -------------------------------
+if name:
+    st.subheader(f"👩‍🎓 {name} 님을 위한 맞춤 학습 방법")
+    methods, img_file = recommend_method(subject, style, goal)
+    for m in methods:
+        st.success(m)
+    img = Image.open(f"images/{img_file}")  # images 폴더에 미리 이미지 저장 필요
+    st.image(img, caption=f"추천 학습 이미지 - {style}", use_column_width=True)
+
+# -------------------------------
+# 추가 기능: 랜덤 학습 명언
+# -------------------------------
+quotes = [
+    "공부는 끝없는 여행이다. - 익명",
+    "노력은 배신하지 않는다. - 손흥민",
+    "성공은 작은 습관의 반복이다. - 아리스토텔레스",
+    "배우기를 멈추면 성장을 멈춘다. - 익명",
+    "성공은 준비된 자에게 온다. - 파스퇴르",
+    "오늘의 노력은 내일의 자산이다. - 익명"
+]
+if st.button("오늘의 학습 명언 보기"):
+    st.info(random.choice(quotes))
