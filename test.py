@@ -1,116 +1,147 @@
 import streamlit as st
-from PIL import Image
 import random
 
-# -------------------------------
 # 페이지 설정
-# -------------------------------
-st.set_page_config(page_title="학습 방법 추천 앱", page_icon="📚", layout="wide")
+st.set_page_config(page_title="학습 방법 추천 앱", page_icon="📚", layout="centered")
 
-st.title("📚 나에게 맞는 학습 방법 찾기")
-st.write("""
-이 앱은 학습자의 **스타일**과 **목표**를 입력받아, 가장 적합한 학습 방법을 추천해줍니다.
-""")
+# 제목
+st.title("📚 맞춤형 학습 방법 추천 앱")
+st.write("당신의 학습 스타일과 목표에 따라 최적의 학습 방법을 추천해드립니다!")
 
-# -------------------------------
-# 사이드바 입력
-# -------------------------------
-st.sidebar.header("📌 나의 학습 정보 입력")
-name = st.sidebar.text_input("이름을 입력하세요:")
-subject = st.sidebar.selectbox("공부할 과목을 선택하세요", ["수학", "영어", "과학", "역사", "프로그래밍"])
-style = st.sidebar.radio("학습 스타일", ["시각형 (Visual)", "청각형 (Auditory)", "운동감각형 (Kinesthetic)", "읽기/쓰기형 (Reading/Writing)"])
-goal = st.sidebar.selectbox("목표", ["시험 대비", "장기적 이해", "프로젝트 수행", "기초 개념 익히기", "창의적 문제 해결"])
+# 사용자 입력
+st.subheader("1️⃣ 기본 정보 입력")
+name = st.text_input("이름을 입력하세요")
+age = st.number_input("나이를 입력하세요", min_value=10, max_value=80, step=1)
+goal = st.selectbox("학습 목표를 선택하세요", ["시험 대비", "취업 준비", "자기계발", "기타"])
 
-# -------------------------------
-# 추천 알고리즘 (다양화)
-# -------------------------------
-def recommend_method(subject, style, goal):
-    if style == "시각형 (Visual)":
-        if goal == "시험 대비":
-            return [
-                "마인드맵과 요약 노트를 활용해 시각적으로 정리하세요.",
-                "색깔 펜과 하이라이트로 중요한 부분을 강조하세요.",
-                "과목별 개념도를 만들어 전체 구조를 파악하세요."
-            ], "visual_map.jpg"
-        elif goal == "창의적 문제 해결":
-            return [
-                "디자인 씽킹 보드나 아이디어 스케치를 활용하세요.",
-                "비주얼 브레인스토밍을 통해 다양한 아이디어를 연결해보세요."
-            ], "visual_creative.jpg"
-        else:
-            return [
-                "인포그래픽, 도표, 색상 강조 자료를 활용하세요.",
-                "영상 강의와 그림 자료를 반복 시청하세요."
-            ], "visual_study.jpg"
+st.subheader("2️⃣ 학습 스타일 진단")
+style = st.radio("당신은 어떤 방식으로 학습하는 걸 좋아하나요?", 
+                 ["시각적 (이미지, 다이어그램)", "청각적 (강의, 오디오)", "실습 중심 (직접 해보기)", "읽기/쓰기"])
 
-    elif style == "청각형 (Auditory)":
-        if goal == "장기적 이해":
-            return [
-                "스터디 그룹 토론이나 강의 녹음을 통해 반복 학습하세요.",
-                "자신의 목소리로 개념을 설명하고 녹음해 들어보세요."
-            ], "auditory_group.jpg"
-        elif goal == "시험 대비":
-            return [
-                "암기할 내용을 노래 가사처럼 만들어 외워보세요.",
-                "강의나 설명을 여러 번 들어보세요."
-            ], "auditory_exam.jpg"
-        else:
-            return [
-                "팟캐스트, 오디오 강의로 학습하세요.",
-                "학습 내용을 친구에게 설명하며 대화형으로 복습하세요."
-            ], "auditory_learning.jpg"
+time = st.slider("하루에 학습 가능한 시간은 몇 시간인가요?", 0, 10, 2)
 
-    elif style == "운동감각형 (Kinesthetic)":
-        if goal == "프로젝트 수행":
-            return [
-                "실습 중심 프로젝트나 실험을 통해 배우세요.",
-                "직접 손으로 코드를 작성하거나 실험을 진행하세요."
-            ], "kinesthetic_project.jpg"
-        else:
-            return [
-                "카드 정리, 퀴즈, 모형 만들기 등 활동 기반 학습을 해보세요.",
-                "실제 사례를 적용하며 배우세요."
-            ], "kinesthetic_learning.jpg"
+motivation = st.selectbox("현재 학습 동기 수준은 어떤가요?", ["매우 낮음", "보통", "높음", "매우 높음"])
 
-    elif style == "읽기/쓰기형 (Reading/Writing)":
-        if goal == "기초 개념 익히기":
-            return [
-                "교재를 꼼꼼히 읽고 노트 필기를 정리하세요.",
-                "배운 내용을 글로 요약해 블로그나 일지에 기록하세요."
-            ], "reading_basic.jpg"
-        else:
-            return [
-                "문제집 풀이와 서술형 답안을 작성해보세요.",
-                "자신만의 요약집을 만들어 반복 학습하세요."
-            ], "reading_study.jpg"
+# 추천 알고리즘 (간단한 예시)
+def recommend_learning(style, goal, time, motivation):
+    rec = []
+    
+    if style == "시각적 (이미지, 다이어그램)":
+        rec.append("마인드맵, 인포그래픽, 유튜브 강의 활용")
+    elif style == "청각적 (강의, 오디오)":
+        rec.append("팟캐스트, 오디오북, 강의 녹음 반복 청취")
+    elif style == "실습 중심 (직접 해보기)":
+        rec.append("프로젝트 기반 학습, 문제 풀이 중심 학습")
+    else:
+        rec.append("노트 필기, 요약 정리, 블로그 글 작성")
 
-    return ["일반적인 학습 방법을 참고하세요."], "default.jpg"
+    if goal == "시험 대비":
+        rec.append("기출문제 풀이 + 시간 제한 모의고사 진행")
+    elif goal == "취업 준비":
+        rec.append("면접 스터디, 포트폴리오 제작")
+    elif goal == "자기계발":
+        rec.append("책 읽기, 온라인 강의 수강")
+    else:
+        rec.append("관심 분야의 자유 탐구")
 
-# -------------------------------
-# 추천 결과 출력
-# -------------------------------
-if name:
-    st.subheader(f"👩‍🎓 {name} 님을 위한 맞춤 학습 방법")
-    methods, img_file = recommend_method(subject, style, goal)
-    for m in methods:
-        st.success(m)
-    try:
-        img = Image.open(f"images/{img_file}")  # images 폴더에 미리 이미지 저장 필요
-        st.image(img, caption=f"추천 학습 이미지 - {style}", use_column_width=True)
-    except:
-        st.warning("이미지를 불러올 수 없습니다. 'images/' 폴더를 확인해주세요.")
+    if time < 2:
+        rec.append("짧고 집중적인 학습(예: Pomodoro 기법)")
+    else:
+        rec.append("체계적 커리큘럼 계획 세우기")
 
-# -------------------------------
-# 추가 기능: 랜덤 학습 명언
-# -------------------------------
-quotes = [
-    "공부는 끝없는 여행이다. - 익명",
-    "노력은 배신하지 않는다. - 손흥민",
-    "성공은 작은 습관의 반복이다. - 아리스토텔레스",
-    "배우기를 멈추면 성장을 멈춘다. - 익명",
-    "성공은 준비된 자에게 온다. - 파스퇴르",
-    "오늘의 노력은 내일의 자산이다. - 익명"
-]
-if st.button("오늘의 학습 명언 보기"):
-    st.info(random.choice(quotes))
+    if motivation in ["매우 낮음", "보통"]:
+        rec.append("학습 파트너 구하기, 보상 시스템 활용")
+    else:
+        rec.append("스스로 목표 설정 및 성취감 활용")
+
+    return rec
+
+
+# 명언 사전 (목표 + 동기 조합)
+quotes = {
+    "시험 대비": {
+        "매우 낮음": [
+            "성공은 매일 반복한 작은 노력들의 합이다. – 로버트 콜리어",
+            "천천히 가도 포기하지 않으면 결국 도착한다. – 공자"
+        ],
+        "보통": [
+            "오늘 할 수 있는 일을 내일로 미루지 마라. – 벤자민 프랭클린",
+            "노력은 배신하지 않는다. – 일본 속담"
+        ],
+        "높음": [
+            "할 수 있다고 믿으면 길이 보인다. – 헨리 포드",
+            "실패는 성공의 어머니이다. – 토마스 에디슨"
+        ],
+        "매우 높음": [
+            "배움은 마음을 지치게 하지 않는다. – 레오나르도 다 빈치",
+            "끝까지 해내는 자가 승리한다. – 한국 속담"
+        ]
+    },
+    "취업 준비": {
+        "매우 낮음": [
+            "위대한 업적은 작은 용기에서 시작된다. – 셰익스피어",
+            "기회는 준비된 자에게 온다. – 파스퇴르"
+        ],
+        "보통": [
+            "성공은 준비와 기회의 만남이다. – 세네카",
+            "꿈을 꾸는 자만이 미래를 본다. – 엘리너 루즈벨트"
+        ],
+        "높음": [
+            "행동이 말보다 크다. – 링컨",
+            "한 걸음 더 내딛는 용기가 미래를 바꾼다. – 한국 속담"
+        ],
+        "매우 높음": [
+            "스스로를 믿어라. 당신은 생각보다 강하다. – 미상",
+            "도전 없는 성취는 없다. – 아인슈타인"
+        ]
+    },
+    "자기계발": {
+        "매우 낮음": [
+            "작은 변화가 큰 차이를 만든다. – 미상",
+            "시작이 반이다. – 아리스토텔레스"
+        ],
+        "보통": [
+            "배움은 끝이 없다. – 미상",
+            "꾸준함이 천재를 이긴다. – 한국 속담"
+        ],
+        "높음": [
+            "지식에 대한 투자는 최고의 이익을 낸다. – 벤자민 프랭클린",
+            "배우기를 멈추는 순간 성장은 멈춘다. – 미상"
+        ],
+        "매우 높음": [
+            "당신이 할 수 있다고 믿든, 할 수 없다고 믿든 믿는 대로 된다. – 헨리 포드",
+            "미래는 오늘 준비하는 자의 것이다. – 말콤 엑스"
+        ]
+    },
+    "기타": {
+        "매우 낮음": [
+            "한 번의 실패가 끝을 의미하지 않는다. – 미상",
+            "천천히라도 멈추지 말라. – 미상"
+        ],
+        "보통": [
+            "도전 없는 삶은 의미가 없다. – 미상",
+            "작은 성취도 큰 발걸음이다. – 미상"
+        ],
+        "높음": [
+            "끝까지 해내는 자가 진정한 승리자다. – 미상",
+            "노력은 절대 헛되지 않는다. – 미상"
+        ],
+        "매우 높음": [
+            "스스로의 한계를 뛰어넘어라. – 미상",
+            "당신의 가능성은 무한하다. – 미상"
+        ]
+    }
+}
+
+# 결과 출력
+if st.button("✨ 학습 방법 추천받기"):
+    recommendations = recommend_learning(style, goal, time, motivation)
+    st.subheader(f"🎯 {name}님을 위한 추천 학습 방법")
+    for r in recommendations:
+        st.markdown(f"- {r}")
+
+    # 조건부 명언 출력
+    st.subheader("🌟 오늘의 명언")
+    selected_quote = random.choice(quotes[goal][motivation])
+    st.info(selected_quote)
 
